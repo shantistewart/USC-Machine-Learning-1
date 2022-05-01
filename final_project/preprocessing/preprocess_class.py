@@ -50,15 +50,6 @@ class Preprocessor:
                 dim: (N, )
         """
 
-        # set default categorical feature names:
-        if bin_feature_names is None:
-            bin_feature_names = BIN_FEATURES
-        if nom_feature_names is None:
-            nom_feature_names = NOM_FEATURES
-        # set default bins for quantizing labels:
-        if bins is None:
-            bins = BINS_QUANTIZE
-
         # encode features and convert to numpy array:
         X = self.encode_features(X_orig, bin_feature_names, nom_feature_names, train)
         X = X.to_numpy(dtype=float, copy=True)
