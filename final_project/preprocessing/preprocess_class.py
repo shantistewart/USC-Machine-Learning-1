@@ -6,6 +6,14 @@ import numpy as np
 from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder
 
 
+# default names of categorical (binary/nominal) features:
+BIN_FEATURES = ["school", "sex", "address", "famsize", "Pstatus", "schoolsup", "famsup", "paid", "activities",
+                "nursery", "higher", "internet", "romantic"]
+NOM_FEATURES = ["Mjob", "Fjob", "reason", "guardian"]
+# default bins for quantizing labels:
+BINS_QUANTIZE = np.array([20.5, 16, 14, 12, 10, 0])
+
+
 class Preprocessor:
     """Class for preprocessing data.
 
@@ -18,7 +26,7 @@ class Preprocessor:
         self.ordinal_encoder = None
         self.one_hot_encoder = None
 
-    def preprocess_data(self, X_orig, y_orig, bin_feature_names, nom_feature_names, bins, train):
+    def preprocess_data(self, X_orig, y_orig, bin_feature_names=None, nom_feature_names=None, bins=None, train=False):
         """Encodes categorical features and quantizes labels into bins (for classification).
 
         Args:
@@ -28,7 +36,7 @@ class Preprocessor:
                 dim: (N, )
             bin_feature_names: List of names of binary (categorical with two possible values) features.
             nom_feature_names: List of names of nominal (multivalued categorical with no logical ordering) features.
-            bins: 1D array of bin edges (decreasing order), where bin i = [bins[i], bin[i-1]).
+            bins: 1D array of bin edges (decreasing order) for quantizing labels, where bin i = [bins[i], bin[i-1]).
                 dim: (n_classes+1, )
             train: Whether in training mode or not.
 
@@ -39,6 +47,15 @@ class Preprocessor:
                 dim: (N, )
         """
 
+        # set default categorical feature names:
+        if bin_feature_names is None:
+            bin_feature_names = BIN_FEATURES
+        if nom_feature_names is None:
+            nom_feature_names = NOM_FEATURES
+        # set default bins for quantizing labels:
+        if bins is None:
+            bins = BINS_QUANTIZE
+
         # encode features and convert to numpy array:
         X = self.encode_features(X_orig, bin_feature_names, nom_feature_names, train)
         X = X.to_numpy(dtype=float, copy=True)
@@ -48,7 +65,7 @@ class Preprocessor:
 
         return X, y
 
-    def encode_features(self, X_orig, bin_feature_names, nom_feature_names, train):
+    def encode_features(self, X_orig, bin_feature_names=None, nom_feature_names=None, train=False):
         """Encodes categorical features.
 
         Args:
@@ -62,6 +79,12 @@ class Preprocessor:
             X: Encoded features (dataframe).
                 dim: (N, D)
         """
+
+        # set default categorical feature names:
+        if bin_feature_names is None:
+            bin_feature_names = BIN_FEATURES
+        if nom_feature_names is None:
+            nom_feature_names = NOM_FEATURES
 
         # encode binary features using ordinal encoding:
         X_bin_orig = X_orig[bin_feature_names]
@@ -99,7 +122,8 @@ class Preprocessor:
 
         return X
 
-    def quantize_labels(self, y_orig, bins):
+    @staticmethod
+    def quantize_labels(y_orig, bins=None):
         """Quantizes labels into bins, for classification.
 
         Args:
@@ -113,6 +137,10 @@ class Preprocessor:
                 dim: (N, )
         """
 
+        # set default bins:
+        if bins is None:
+            bins = BINS_QUANTIZE
+
         # convert series to numpy array:
         y_orig = y_orig.to_numpy(dtype=int, copy=True)
         # quantize original labels by binning them:
@@ -123,25 +151,23 @@ class Preprocessor:
 
 """
 # TESTING:
-from load_data_class import DataLoader
+from final_project.preprocessing.load_data_class import DataLoader
 
 # data file name:
 data_file = "../data/student_performance_train.csv"
-# names of binary/nominal features:
-bin_feature_names = ["school", "sex", "address", "famsize", "Pstatus", "schoolsup", "famsup", "paid", "activities",
-                     "nursery", "higher", "internet", "romantic"]
-nom_feature_names = ["Mjob", "Fjob", "reason", "guardian"]
+# mission type:
+mission = 3
 
 print()
-# get data:
-get_data = DataLoader()
-X_orig, y_orig = get_data.load_and_split_data(data_file, 3)
+# load data:
+loader = DataLoader()
+X_orig, y_orig = loader.load_and_split_data(data_file, mission)
 # print("Dim of X_orig: {}".format(X_orig.shape))
 # print(X_orig.head())
 
 # encode features:
 prep = Preprocessor()
-X = prep.encode_features(X_orig, bin_feature_names, nom_feature_names, train=True)
+X = prep.encode_features(X_orig, train=True)
 print()
 print("Dim of X: {}".format(X.shape))
 print(X.head())
@@ -151,12 +177,10 @@ print()
 print(X.describe())
 
 # test quantize_labels() method:
-bins = np.array([20.5, 15.5, 13.5, 11.5, 9.5, -0.5])
-y = prep.quantize_labels(y_orig, bins)
+y = prep.quantize_labels(y_orig)
 print()
 print(y_orig)
 print()
 print(y)
-
 """
 
