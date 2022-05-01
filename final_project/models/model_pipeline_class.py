@@ -15,7 +15,7 @@ class ModelPipeline:
             Mission 1: predict G1 and remove G2 and G3 features.
             Mission 2: predict G3 and remove G1 and G2 features.
             Mission 3: predict G3, while keeping G1 and G2 features.
-        pipe: sklearn pipeline object for model.
+        model_pipe: sklearn pipeline object for model.
     """
 
     def __init__(self, mission):
