@@ -2,7 +2,7 @@
 
 
 import pandas as pd
-from load_data_class import DataLoader
+from final_project.preprocessing.load_data_class import DataLoader
 
 # configure pandas display options:
 pd.set_option("display.max_columns", 10)
