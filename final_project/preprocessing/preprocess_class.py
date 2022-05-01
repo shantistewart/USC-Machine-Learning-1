@@ -20,11 +20,14 @@ class Preprocessor:
     Attributes:
         ordinal_encoder: sklearn OrdinalEncoder object.
         one_hot_encoder: sklearn OneHotEncoder object.
+        class_priors: Class prior probabilities.
+            dim: (n_classes, )
     """
 
     def __init__(self):
         self.ordinal_encoder = None
         self.one_hot_encoder = None
+        self.class_priors = None
 
     def preprocess_data(self, X_orig, y_orig, bin_feature_names=None, nom_feature_names=None, bins=None, train=False):
         """Encodes categorical features and quantizes labels into bins (for classification).
@@ -62,6 +65,9 @@ class Preprocessor:
 
         # quantize labels:
         y = self.quantize_labels(y_orig, bins)
+
+        # compute class priors:
+        self.compute_class_priors(y)
 
         return X, y
 
@@ -121,6 +127,25 @@ class Preprocessor:
         X = X.astype(dtype=float)
 
         return X
+
+    def compute_class_priors(self, y):
+        """Computes class prior probabilities.
+
+        Args:
+            y: Quantized labels, with integer encoding (values in [0, n_classes-1])
+                dim: (N, )
+
+        Returns:
+            class_priors: Class prior probabilities.
+                dim: (n_classes, )
+        """
+
+        # get class counts:
+        class_vals, class_counts = np.unique(y, return_counts=True)
+        # convert to probabilities:
+        self.class_priors = class_counts / np.sum(class_counts)
+
+        return self.class_priors
 
     @staticmethod
     def quantize_labels(y_orig, bins=None):
