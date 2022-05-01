@@ -40,7 +40,7 @@ class ModelPipeline:
         normalizer = None
         # create sklearn normalization object:
         if norm_type == "standard":
-            normalizer = StandardScaler
+            normalizer = StandardScaler()
 
         # create pipeline:
         self.model_pipe = Pipeline(steps=[
