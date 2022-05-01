@@ -57,8 +57,9 @@ class Preprocessor:
         # quantize labels:
         y = self.quantize_labels(y_orig, bins)
 
-        # compute class priors:
-        self.compute_class_priors(y)
+        # if training, compute class priors:
+        if train:
+            self.compute_class_priors(y)
 
         return X, y
 
