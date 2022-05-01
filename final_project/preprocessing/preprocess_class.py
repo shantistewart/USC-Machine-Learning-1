@@ -18,19 +18,19 @@ class Preprocessor:
         self.ordinal_encoder = None
         self.one_hot_encoder = None
 
-    def preprocess_data(self, X_orig, bin_feature_names, nom_feature_names, train, y_orig, bins):
+    def preprocess_data(self, X_orig, y_orig, bin_feature_names, nom_feature_names, bins, train):
         """Encodes categorical features and quantizes labels into bins (for classification).
 
         Args:
             X_orig: Original features (dataframe).
                 dim: (N_orig, D)
-            bin_feature_names: List of names of binary (categorical with two possible values) features.
-            nom_feature_names: List of names of nominal (multivalued categorical with no logical ordering) features.
-            train: Whether in training mode or not.
             y_orig: Original labels (series).
                 dim: (N, )
+            bin_feature_names: List of names of binary (categorical with two possible values) features.
+            nom_feature_names: List of names of nominal (multivalued categorical with no logical ordering) features.
             bins: 1D array of bin edges (decreasing order), where bin i = [bins[i], bin[i-1]).
                 dim: (n_classes+1, )
+            train: Whether in training mode or not.
 
         Returns:
             X: Encoded features.
