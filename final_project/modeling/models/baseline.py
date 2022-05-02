@@ -2,7 +2,7 @@
 
 
 from sklearn.neighbors import NearestCentroid
-from final_project.modeling.final_evaluation import final_eval
+from final_project.modeling.run_missions import run_missions
 
 
 # data file names:
@@ -17,5 +17,5 @@ model = NearestCentroid(metric="euclidean")
 norm_type = "standard"
 
 # train and evaluate model:
-final_eval(model, norm_type, train_data_file, test_data_file)
+run_missions(train_data_file, test_data_file, model, norm_type=norm_type, tune_model=False, verbose=2)
 
