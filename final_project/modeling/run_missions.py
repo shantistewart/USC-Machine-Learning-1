@@ -66,9 +66,9 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", t
                                                                                       n_folds=n_folds, scoring=scoring,
                                                                                       verbose=verbose)
             # save best model information to nested dictionary:
-            best_model["mission_" + str(mission)] = {}
-            best_model["mission_" + str(mission)]["hyperparams"] = best_hyperparams
-            best_model["mission_" + str(mission)]["cv_score"] = best_cv_score
+            best_models["mission_" + str(mission)] = {}
+            best_models["mission_" + str(mission)]["hyperparams"] = best_hyperparams
+            best_models["mission_" + str(mission)]["cv_score"] = best_cv_score
 
         # evaluate model on training set:
         if verbose != 0:
