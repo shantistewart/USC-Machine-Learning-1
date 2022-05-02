@@ -25,8 +25,8 @@ class Preprocessor:
     """
 
     def __init__(self):
-        self.ordinal_encoder = None
-        self.one_hot_encoder = None
+        self.ordinal_encoder = OrdinalEncoder(dtype=float)
+        self.one_hot_encoder = OneHotEncoder(sparse=False, dtype=float)
         self.class_priors = None
 
     def preprocess_data(self, X_orig, y_orig, bin_feature_names=None, nom_feature_names=None, bins=None, train=False):
@@ -86,7 +86,6 @@ class Preprocessor:
 
         # encode binary features using ordinal encoding:
         X_bin_orig = X_orig[bin_feature_names]
-        self.ordinal_encoder = OrdinalEncoder(dtype=float)
         # fit encoder to data if in training mode:
         if train:
             self.ordinal_encoder.fit(X_bin_orig)
@@ -96,7 +95,6 @@ class Preprocessor:
 
         # encode nominal features using one-hot encoding:
         X_nom_orig = X_orig[nom_feature_names]
-        self.one_hot_encoder = OneHotEncoder(sparse=False, dtype=float)
         # fit encoder to data if in training mode:
         if train:
             self.one_hot_encoder.fit(X_nom_orig)
