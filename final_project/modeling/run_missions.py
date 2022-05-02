@@ -28,9 +28,12 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", t
         verbose: Nothing printed (0), some things printed (1), everything printed (2).
 
     Returns:
-        metrics: Nested dictionaries of training/test set metrics.
+        metrics: Nested dictionary of training/test set metrics.
             metrics["mission_x"]["train"]["metric_name"] = mission x's training set metric_name metric
             metrics["mission_x"]["test"]["metric_name"] = mission x's test set metric_name metric
+        best_models: Nested dictionary of best model information after hyperparameter tuning.
+            best_models["mission_x"]["hyperparams"] = mission x's best model hyperparameters
+            best_models["mission_x"]["cv_score"] = mission x's best model cross-validation score.
     """
 
     # set default missions:
@@ -38,6 +41,7 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", t
         missions = MISSIONS
 
     metrics = {}
+    best_models = {}
     # run missions:
     for mission in missions:
         if verbose != 0:
@@ -61,6 +65,10 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", t
                                                                                       search_type=search_type,
                                                                                       n_folds=n_folds, scoring=scoring,
                                                                                       verbose=verbose)
+            # save best model information to nested dictionary:
+            best_model["mission_" + str(mission)] = {}
+            best_model["mission_" + str(mission)]["hyperparams"] = best_hyperparams
+            best_model["mission_" + str(mission)]["cv_score"] = best_cv_score
 
         # evaluate model on training set:
         if verbose != 0:
@@ -78,5 +86,5 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", t
         metrics["mission_" + str(mission)]["train"] = train_metrics
         metrics["mission_" + str(mission)]["test"] = test_metrics
 
-    return metrics
+    return metrics, best_models
 
