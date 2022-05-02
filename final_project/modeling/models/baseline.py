@@ -1,4 +1,4 @@
-"""Script for running a nearest means classifier (baseline system) for mission 1."""
+"""Script for running a nearest means classifier (baseline system)."""
 
 
 from sklearn.neighbors import NearestCentroid
