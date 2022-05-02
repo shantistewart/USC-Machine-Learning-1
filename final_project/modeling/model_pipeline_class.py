@@ -67,9 +67,10 @@ class ModelPipeline:
             verbose: Nothing printed (0), accuracy and macro F1-score printed (1), all metrics printed (2)
 
         Returns:
-            accuracy: Subset accuracy.
-            macro_f1: Macro F1-score.
-            conf_matrix: Confusion matrix.
+            metrics: Dictionary of performance metrics.
+                metrics["accuracy"] = subset accuracy
+                metrics["macro_f1"] = macro F1-score
+                metrics["conf_matrix"] = confusion matrix
         """
 
         # load data:
@@ -92,7 +93,12 @@ class ModelPipeline:
         if verbose == 2:
             print("confusion matrix = \n{}".format(conf_matrix))
 
-        return accuracy, macro_f1, conf_matrix
+        # save metrics to dictionary:
+        metrics = {"accuracy": accuracy,
+                   "macro_f1": macro_f1,
+                   "conf_matrix": conf_matrix}
+
+        return metrics
 
     def make_pipeline(self, model, norm_type="standard"):
         """Creates a sklearn model pipeline object.
