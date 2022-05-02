@@ -41,32 +41,6 @@ class ModelPipeline:
         self.model_pipe = None
         self.make_pipeline(model, norm_type=norm_type)
 
-    def make_pipeline(self, model, norm_type="standard"):
-        """Creates a sklearn model pipeline object.
-
-        Args:
-            model: sklearn model (estimator) object.
-            norm_type: Type of normalization to use.
-                allowed values: "standard"
-
-        Returns: None
-        """
-
-        # validate normalization type:
-        if norm_type != "standard":
-            raise Exception("Invalid normalization type.")
-
-        normalizer = None
-        # create sklearn normalization object:
-        if norm_type == "standard":
-            normalizer = StandardScaler()
-
-        # create pipeline:
-        self.model_pipe = Pipeline(steps=[
-            ("normalizer", normalizer),
-            ("model", model)
-        ])
-
     def train(self, train_data_file):
         """Trains model.
 
@@ -119,4 +93,30 @@ class ModelPipeline:
             print("confusion matrix = \n{}".format(conf_matrix))
 
         return accuracy, macro_f1, conf_matrix
+
+    def make_pipeline(self, model, norm_type="standard"):
+        """Creates a sklearn model pipeline object.
+
+        Args:
+            model: sklearn model (estimator) object.
+            norm_type: Type of normalization to use.
+                allowed values: "standard"
+
+        Returns: None
+        """
+
+        # validate normalization type:
+        if norm_type != "standard":
+            raise Exception("Invalid normalization type.")
+
+        normalizer = None
+        # create sklearn normalization object:
+        if norm_type == "standard":
+            normalizer = StandardScaler()
+
+        # create pipeline:
+        self.model_pipe = Pipeline(steps=[
+            ("normalizer", normalizer),
+            ("model", model)
+        ])
 
