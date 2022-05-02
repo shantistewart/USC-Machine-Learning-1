@@ -21,10 +21,7 @@ class ModelPipeline:
         norm_type: Type of normalization to use.
             allowed values: "standard"
         model_pipe: sklearn Pipeline object for model.
-            Model (estimator) step is set to a model with some initial hyperparameters with __init__() method, but it
-                is updated to the best model when tune_hyperparams() method is called. This way, eval() method will
-                evaluate using the current model.
-        best_model: Best model (i.e., model with best hyperparameters).
+            Updated to best model (i.e., model with best hyperparameters) when tune_hyperparams() method is called.
         best_hyperparams: Best hyperparameters (dictionary).
     """
 
@@ -50,7 +47,6 @@ class ModelPipeline:
         self.mission = mission
         self.preprocessor = Preprocessor()
         self.norm_type = norm_type
-        self.best_model = None
         self.best_hyperparams = None
 
         # initialize sklearn pipeline object:
@@ -130,7 +126,7 @@ class ModelPipeline:
                 cross-validation score printed (2).
 
         Returns:
-            best_model: Best model (i.e., model with best hyperparameters).
+            model_pipe: sklearn Pipeline object for best model (i.e., model with best hyperparameters).
             best_hyperparams: Best hyperparameters (dictionary).
             best_cv_score: Cross-validation score of best model.
         """
@@ -152,7 +148,7 @@ class ModelPipeline:
         search.fit(X, y)
 
         # save best model, best hyperparameters, and best cross-validation score:
-        self.best_model = search.best_estimator_
+        self.model_pipe = search.best_estimator_
         self.best_hyperparams = search.best_params_
         best_cv_score = search.best_score_
         # print hyperparameter tuning results:
@@ -161,10 +157,7 @@ class ModelPipeline:
         if verbose != 0:
             print("Best cross-validation {0}: {1}".format(scoring, best_cv_score))
 
-        # update sklearn Pipeline object with best model:
-        self.make_pipeline(self.best_model)
-
-        return self.best_model, self.best_hyperparams, best_cv_score
+        return self.model_pipe, self.best_hyperparams, best_cv_score
 
     def make_pipeline(self, model):
         """Creates a sklearn Pipeline object for model.
