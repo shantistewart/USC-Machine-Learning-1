@@ -67,7 +67,7 @@ class ModelPipeline:
             verbose: Nothing printed (0), accuracy and macro F1-score printed (1), all metrics printed (2)
 
         Returns:
-            acc: Subset accuracy.
+            accuracy: Subset accuracy.
             macro_f1: Macro F1-score.
             conf_matrix: Confusion matrix.
         """
