@@ -103,7 +103,7 @@ class ModelPipeline:
         macro_f1 = f1_score(y, y_pred, average="macro")
         conf_matrix = confusion_matrix(y, y_pred, normalize=None)
         # print metrics:
-        if verbose == 1 or verbose == 2:
+        if verbose != 0:
             print("accuracy = {} %".format(100*accuracy))
             print("macro F1-score = {}".format(macro_f1))
         if verbose == 2:
@@ -116,7 +116,7 @@ class ModelPipeline:
 
         return metrics
 
-    def tune_hyperparams(self, data_file, hyper_params, search_type="grid", n_folds=10, scoring="accuracy"):
+    def tune_hyperparams(self, data_file, hyper_params, search_type="grid", n_folds=10, scoring="accuracy", verbose=1):
         """Tunes hyperparameters (i.e., model selection).
 
         Args:
@@ -126,6 +126,8 @@ class ModelPipeline:
                 allowed values: "grid"
             n_folds: Number of folds (K) to use in stratified K-fold cross validation.
             scoring: Type of metric to use for model evaluation.
+            verbose: Nothing printed (0), cross-validation score printed (1), best hyperparameters and best
+                cross-validation score printed (2).
 
         Returns:
             best_model: Best model (i.e., model with best hyperparameters).
@@ -153,6 +155,11 @@ class ModelPipeline:
         self.best_model = search.best_estimator_
         self.best_hyperparams = search.best_params_
         best_cv_score = search.best_score_
+        # print hyperparameter tuning results:
+        if verbose == 2:
+            print("Best hyperparameters: {}".format(self.best_hyperparams))
+        if verbose != 0:
+            print("Best cross-validation {0}: {1}".format(scoring, best_cv_score))
 
         # update sklearn Pipeline object with best model:
         self.make_pipeline(self.best_model)
