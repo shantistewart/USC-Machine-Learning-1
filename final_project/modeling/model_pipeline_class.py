@@ -1,15 +1,16 @@
-"""File containing class for training and evaluation pipelines."""
+"""File containing class for training, tuning, and evaluating a model."""
 
 
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
 from final_project.preprocessing.load_data_class import DataLoader
 from final_project.preprocessing.preprocess_class import Preprocessor
 
 
 class ModelPipeline:
-    """Class for training and evaluation pipelines.
+    """Class for training, tuning, and evaluating a model.
 
     Attributes:
         mission: (1, 2, or 3) Type of mission (task).
@@ -17,7 +18,14 @@ class ModelPipeline:
             Mission 2: predict G3 and remove G1 and G2 features.
             Mission 3: predict G3, while keeping G1 and G2 features.
         preprocessor: Preprocessor object.
+        norm_type: Type of normalization to use.
+            allowed values: "standard"
         model_pipe: sklearn Pipeline object for model.
+            Model (estimator) step is set to a model with some initial hyperparameters with __init__() method, but it
+                is updated to the best model when tune_hyperparams() method is called. This way, eval() method will
+                evaluate using the current model.
+        best_model: Best model (i.e., model with best hyperparameters).
+        best_hyperparams: Best hyperparameters (dictionary).
     """
 
     def __init__(self, mission, model, norm_type="standard"):
@@ -35,11 +43,19 @@ class ModelPipeline:
         Returns: None
         """
 
+        # validate normalization type:
+        if norm_type != "standard":
+            raise Exception("Invalid normalization type.")
+
         self.mission = mission
         self.preprocessor = Preprocessor()
-        # make sklearn pipeline object:
+        self.norm_type = norm_type
+        self.best_model = None
+        self.best_hyperparams = None
+
+        # initialize sklearn pipeline object:
         self.model_pipe = None
-        self.make_pipeline(model, norm_type=norm_type)
+        self.make_pipeline(model)
 
     def train(self, train_data_file):
         """Trains model.
@@ -100,24 +116,61 @@ class ModelPipeline:
 
         return metrics
 
-    def make_pipeline(self, model, norm_type="standard"):
-        """Creates a sklearn model pipeline object.
+    def tune_hyperparams(self, data_file, hyper_params, search_type="grid", n_folds=10, scoring="accuracy"):
+        """Tunes hyperparameters (i.e., model selection).
+
+        Args:
+            data_file: Name of data file (used for training/validation).
+            hyper_params: Dictionary of hyperparameter values to search over.
+            search_type: Hyperparameter search type
+                allowed values: "grid"
+            n_folds: Number of folds (K) to use in stratified K-fold cross validation.
+            scoring: Type of metric to use for model evaluation.
+
+        Returns:
+            best_model: Best model (i.e., model with best hyperparameters).
+            best_hyperparams: Best hyperparameters (dictionary).
+            best_cv_score: Cross-validation score of best model.
+        """
+
+        # validate hyperparameter search type:
+        if search_type != "grid":
+            raise Exception("Invalid hyperparameter search type.")
+
+        # load data:
+        loader = DataLoader()
+        X_orig, y_orig = loader.load_and_split_data(data_file, self.mission)
+        # preprocess data:
+        X, y = self.preprocessor.preprocess_data(X_orig, y_orig, train=True)
+
+        # tune hyperparameters:
+        search = None
+        if search_type == "grid":
+            search = GridSearchCV(self.model_pipe, hyper_params, cv=n_folds, scoring=scoring)
+        search.fit(X, y)
+
+        # save best model, best hyperparameters, and best cross-validation score:
+        self.best_model = search.best_estimator_
+        self.best_hyperparams = search.best_params_
+        best_cv_score = search.best_score_
+
+        # update sklearn Pipeline object with best model:
+        self.make_pipeline(self.best_model)
+
+        return self.best_model, self.best_hyperparams, best_cv_score
+
+    def make_pipeline(self, model):
+        """Creates a sklearn Pipeline object for model.
 
         Args:
             model: sklearn model (estimator) object.
-            norm_type: Type of normalization to use.
-                allowed values: "standard"
 
         Returns: None
         """
 
-        # validate normalization type:
-        if norm_type != "standard":
-            raise Exception("Invalid normalization type.")
-
         normalizer = None
         # create sklearn normalization object:
-        if norm_type == "standard":
+        if self.norm_type == "standard":
             normalizer = StandardScaler()
 
         # create pipeline:
