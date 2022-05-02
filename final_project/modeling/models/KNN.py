@@ -25,6 +25,6 @@ hyperparams = {"model__n_neighbors": k_values,
 metric = "f1_macro"
 
 # train and evaluate model:
-run_missions(train_data_file, test_data_file, model, norm_type=norm_type, hyper_params=hyperparams, scoring=metric,
+run_missions(train_data_file, test_data_file, model, norm_type=norm_type, hyper_params=hyperparams, metric=metric,
              verbose=2)
 

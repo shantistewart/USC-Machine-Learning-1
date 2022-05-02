@@ -112,7 +112,7 @@ class ModelPipeline:
 
         return metrics
 
-    def tune_hyperparams(self, data_file, hyper_params, search_type="grid", n_folds=10, scoring="accuracy", verbose=1):
+    def tune_hyperparams(self, data_file, hyper_params, search_type="grid", n_folds=10, metric="accuracy", verbose=1):
         """Tunes hyperparameters (i.e., model selection).
 
         Args:
@@ -121,7 +121,7 @@ class ModelPipeline:
             search_type: Hyperparameter search type.
                 allowed values: "grid"
             n_folds: Number of folds (K) to use in stratified K-fold cross validation.
-            scoring: Type of metric to use for model evaluation.
+            metric: Type of metric to use for model evaluation.
             verbose: Nothing printed (0), cross-validation score printed (1), best hyperparameters and best
                 cross-validation score printed (2).
 
@@ -144,7 +144,7 @@ class ModelPipeline:
         # tune hyperparameters:
         search = None
         if search_type == "grid":
-            search = GridSearchCV(self.model_pipe, hyper_params, cv=n_folds, scoring=scoring)
+            search = GridSearchCV(self.model_pipe, hyper_params, cv=n_folds, scoring=metric)
         search.fit(X, y)
 
         # save best model, best hyperparameters, and best cross-validation score:
@@ -155,7 +155,7 @@ class ModelPipeline:
         if verbose == 2:
             print("Best hyperparameters: {}".format(self.best_hyperparams))
         if verbose != 0:
-            print("Best cross-validation {0}: {1}".format(scoring, best_cv_score))
+            print("Best cross-validation {0}: {1}".format(metric, best_cv_score))
 
         return self.model_pipe, self.best_hyperparams, best_cv_score
 

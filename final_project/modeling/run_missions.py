@@ -9,7 +9,7 @@ MISSIONS = [1, 2, 3]
 
 
 def run_missions(train_data_file, test_data_file, model, norm_type="standard", tune_model=True, hyper_params=None,
-                 search_type="grid", n_folds=10, scoring="accuracy", final_eval=False, missions=None, verbose=2):
+                 search_type="grid", n_folds=10, metric="accuracy", final_eval=False, missions=None, verbose=2):
     """Trains, tunes, and evaluates model, for each mission.
 
     Args:
@@ -23,7 +23,7 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", t
         search_type: Hyperparameter search type (ignored if tune_model = False).
             allowed values: "grid"
         n_folds: Number of folds (K) to use in stratified K-fold cross validation (ignored if tune_model = False).
-        scoring: Type of metric to use for model evaluation (ignored if tune_model = False).
+        metric: Type of metric to use for model evaluation (ignored if tune_model = False).
         final_eval: Selects whether to evaluate final model on test set.
         missions: List of missions to perform.
         verbose: Nothing printed (0), some things printed (1), everything printed (2).
@@ -64,7 +64,7 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", t
                 raise Exception("Hyperparameter search values argument is none.")
             best_model, best_hyperparams, best_cv_score = model_pipe.tune_hyperparams(train_data_file, hyper_params,
                                                                                       search_type=search_type,
-                                                                                      n_folds=n_folds, scoring=scoring,
+                                                                                      n_folds=n_folds, metric=metric,
                                                                                       verbose=verbose)
             # save best model information to nested dictionary:
             best_models["mission_" + str(mission)] = {}
