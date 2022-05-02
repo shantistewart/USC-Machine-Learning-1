@@ -122,7 +122,7 @@ class ModelPipeline:
         Args:
             data_file: Name of data file (used for training/validation).
             hyper_params: Dictionary of hyperparameter values to search over.
-            search_type: Hyperparameter search type
+            search_type: Hyperparameter search type.
                 allowed values: "grid"
             n_folds: Number of folds (K) to use in stratified K-fold cross validation.
             scoring: Type of metric to use for model evaluation.
