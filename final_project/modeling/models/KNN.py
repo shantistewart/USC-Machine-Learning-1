@@ -16,6 +16,9 @@ print()
 model = KNeighborsClassifier()
 # normalization type:
 norm_type = "standard"
+# number of folds (K) to use in stratified K-fold cross validation:
+n_folds = 10
+
 # hyperparameter values to search over:
 k_values = np.arange(start=0, stop=51, step=2)
 k_values[0] = 1

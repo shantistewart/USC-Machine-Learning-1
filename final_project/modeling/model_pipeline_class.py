@@ -1,8 +1,10 @@
 """File containing class for training, tuning, and evaluating a model."""
 
 
+import numpy as np
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import cross_validate
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
 from final_project.preprocessing.load_data_class import DataLoader
@@ -71,11 +73,15 @@ class ModelPipeline:
         # train model:
         self.model_pipe.fit(X_train, y_train)
 
-    def eval(self, data_file, verbose=1):
+    def eval(self, data_file, eval_type, n_folds=10, verbose=1):
         """Evaluates model on data.
 
         Args:
             data_file: Name of data file.
+            eval_type: Type of evaluation to run.
+                allowed values: "train", "cross_val", "test"
+            n_folds: Number of folds (K) to use in stratified K-fold cross validation (ignored if eval_type !=
+                "cross_val").
             verbose: Nothing printed (0), accuracy and macro F1-score printed (1), all metrics printed (2).
 
         Returns:
@@ -85,30 +91,46 @@ class ModelPipeline:
                 metrics["conf_matrix"] = confusion matrix
         """
 
+        # validate evaluation type:
+        if eval_type != "train" and eval_type != "cross_val" and eval_type != "test":
+            raise Exception("Invalid evaluation type.")
+
         # load data:
         loader = DataLoader()
         X_orig, y_orig = loader.load_and_split_data(data_file, self.mission)
         # preprocess data:
-        X, y = self.preprocessor.preprocess_data(X_orig, y_orig, train=False)
+        if eval_type == "test":
+            train = False
+        else:
+            train = True
+        X, y = self.preprocessor.preprocess_data(X_orig, y_orig, train=train)
 
-        # predict on data:
-        y_pred = self.model_pipe.predict(X)
-
-        # compute metrics (subset accuracy, macro F1-score, confusion matrix):
-        accuracy = accuracy_score(y, y_pred)
-        macro_f1 = f1_score(y, y_pred, average="macro")
-        conf_matrix = confusion_matrix(y, y_pred, normalize=None)
+        # perform cross validation if selected:
+        if eval_type == "cross_val":
+            scores = cross_validate(self.model_pipe, X, y, cv=n_folds, scoring=["accuracy", "f1_macro"])
+            accuracy = np.mean(scores["test_accuracy"])
+            macro_f1 = np.mean(scores["test_f1_macro"])
+        # otherwise, evaluate directly on provided dataset:
+        else:
+            # predict on data:
+            y_pred = self.model_pipe.predict(X)
+            # compute metrics (subset accuracy, macro F1-score, confusion matrix):
+            accuracy = accuracy_score(y, y_pred)
+            macro_f1 = f1_score(y, y_pred, average="macro")
+            if eval_type == "test":
+                conf_matrix = confusion_matrix(y, y_pred, normalize=None)
         # print metrics:
         if verbose != 0:
             print("accuracy = {} %".format(100*accuracy))
             print("macro F1-score = {}".format(macro_f1))
-        if verbose == 2:
+        if eval_type == "test" and verbose == 2:
             print("confusion matrix = \n{}".format(conf_matrix))
 
         # save metrics to dictionary:
         metrics = {"accuracy": accuracy,
-                   "macro_f1": macro_f1,
-                   "conf_matrix": conf_matrix}
+                   "macro_f1": macro_f1}
+        if eval_type == "test":
+            metrics["conf_matrix"] = conf_matrix
 
         return metrics
 
@@ -122,8 +144,7 @@ class ModelPipeline:
                 allowed values: "grid"
             n_folds: Number of folds (K) to use in stratified K-fold cross validation.
             metric: Type of metric to use for model evaluation.
-            verbose: Nothing printed (0), cross-validation score printed (1), best hyperparameters and best
-                cross-validation score printed (2).
+            verbose: Nothing printed (not 2), best hyperparameters printed (2).
 
         Returns:
             model_pipe: sklearn Pipeline object for best model (i.e., model with best hyperparameters).
@@ -154,8 +175,6 @@ class ModelPipeline:
         # print hyperparameter tuning results:
         if verbose == 2:
             print("Best hyperparameters: {}".format(self.best_hyperparams))
-        if verbose != 0:
-            print("Best cross-validation {0}: {1}".format(metric, best_cv_score))
 
         return self.model_pipe, self.best_hyperparams, best_cv_score
 

@@ -22,7 +22,7 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", t
         hyper_params: Dictionary of hyperparameter values to search over (ignored if tune_model = False).
         search_type: Hyperparameter search type (ignored if tune_model = False).
             allowed values: "grid"
-        n_folds: Number of folds (K) to use in stratified K-fold cross validation (ignored if tune_model = False).
+        n_folds: Number of folds (K) to use in stratified K-fold cross validation.
         metric: Type of metric to use for model evaluation (ignored if tune_model = False).
         final_eval: Selects whether to evaluate final model on test set.
         missions: List of missions to perform.
@@ -51,8 +51,13 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", t
         # create initial ModelPipeline object:
         model_pipe = ModelPipeline(mission, model, norm_type=norm_type)
 
-        # tune hyperparameters if selected:
-        if tune_model:
+        # if tuning not desired, train model using given hyperparameters:
+        if not tune_model:
+            if verbose != 0:
+                print("Training model...")
+            model_pipe.train(train_data_file)
+        # otherwise, tune hyperparameters:
+        else:
             if verbose != 0:
                 print("Tuning model hyperparameters...")
             if hyper_params is None:
@@ -66,22 +71,25 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", t
             best_models["mission_" + str(mission)]["hyperparams"] = best_hyperparams
             best_models["mission_" + str(mission)]["cv_score"] = best_cv_score
 
-        # (re)train model on full training set:
-        if verbose != 0:
-            print("Training model on full training set...")
-        model_pipe.train(train_data_file)
-
         # evaluate model on training set:
         if verbose != 0:
             print("\nEvaluating model on training set...")
-        train_metrics = model_pipe.eval(train_data_file, verbose=verbose)
+        train_metrics = model_pipe.eval(train_data_file, "train", verbose=verbose)
+
+        # evaluate model using cross validation:
+        if verbose != 0:
+            print("\nEvaluating model using cross validation...")
+        model_pipe.eval(train_data_file, "cross_val", n_folds=n_folds, verbose=verbose)
+        # (re)train model on full training set (since cross validation alters the sklearn Pipeline object):
+        model_pipe.train(train_data_file)
+
         # evaluate model on test set, if selected:
         if final_eval:
             if verbose != 0:
                 print("\nEvaluating model on test set...")
-            test_metrics = model_pipe.eval(test_data_file, verbose=verbose)
-            if verbose != 0:
-                print("")
+            test_metrics = model_pipe.eval(test_data_file, "test", verbose=verbose)
+        if verbose != 0:
+            print("")
 
         # save training/test set metrics to nested dictionary:
         metrics["mission_" + str(mission)] = {}
