@@ -9,7 +9,7 @@ MISSIONS = [1, 2, 3]
 
 
 def run_missions(train_data_file, test_data_file, model, norm_type="standard", tune_model=True, hyper_params=None,
-                 search_type="grid", n_folds=10, scoring="accuracy", missions=None, verbose=2):
+                 search_type="grid", n_folds=10, scoring="accuracy", final_eval=False, missions=None, verbose=2):
     """Trains, tunes, and evaluates model, for each mission.
 
     Args:
@@ -24,6 +24,7 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", t
             allowed values: "grid"
         n_folds: Number of folds (K) to use in stratified K-fold cross validation (ignored if tune_model = False).
         scoring: Type of metric to use for model evaluation (ignored if tune_model = False).
+        final_eval: Selects whether to evaluate final model on test set.
         missions: List of missions to perform.
         verbose: Nothing printed (0), some things printed (1), everything printed (2).
 
@@ -74,17 +75,19 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", t
         if verbose != 0:
             print("\nEvaluating model on training set...")
         train_metrics = model_pipe.eval(train_data_file, verbose=verbose)
-        # evaluate model on test set:
-        if verbose != 0:
-            print("\nEvaluating model on test set...")
-        test_metrics = model_pipe.eval(test_data_file, verbose=verbose)
-        if verbose != 0:
-            print("")
+        # evaluate model on test set, if selected:
+        if final_eval:
+            if verbose != 0:
+                print("\nEvaluating model on test set...")
+            test_metrics = model_pipe.eval(test_data_file, verbose=verbose)
+            if verbose != 0:
+                print("")
 
         # save training/test set metrics to nested dictionary:
         metrics["mission_" + str(mission)] = {}
         metrics["mission_" + str(mission)]["train"] = train_metrics
-        metrics["mission_" + str(mission)]["test"] = test_metrics
+        if final_eval:
+            metrics["mission_" + str(mission)]["test"] = test_metrics
 
     return metrics, best_models
 

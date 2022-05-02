@@ -17,5 +17,5 @@ model = NearestCentroid(metric="euclidean")
 norm_type = "standard"
 
 # train and evaluate model:
-run_missions(train_data_file, test_data_file, model, norm_type=norm_type, tune_model=False, verbose=2)
+run_missions(train_data_file, test_data_file, model, norm_type=norm_type, tune_model=False, final_eval=True, verbose=2)
 
