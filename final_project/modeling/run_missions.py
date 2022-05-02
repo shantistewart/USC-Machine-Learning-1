@@ -51,13 +51,8 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", t
         # create initial ModelPipeline object:
         model_pipe = ModelPipeline(mission, model, norm_type=norm_type)
 
-        # if tuning not desired, train model using given hyperparameters:
-        if not tune_model:
-            if verbose != 0:
-                print("Training model...")
-            model_pipe.train(train_data_file)
-        # otherwise, tune hyperparameters:
-        else:
+        # tune hyperparameters if selected:
+        if tune_model:
             if verbose != 0:
                 print("Tuning model hyperparameters...")
             if hyper_params is None:
@@ -70,6 +65,11 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", t
             best_models["mission_" + str(mission)] = {}
             best_models["mission_" + str(mission)]["hyperparams"] = best_hyperparams
             best_models["mission_" + str(mission)]["cv_score"] = best_cv_score
+
+        # (re)train model on full training set:
+        if verbose != 0:
+            print("Training model on full training set...")
+        model_pipe.train(train_data_file)
 
         # evaluate model on training set:
         if verbose != 0:
