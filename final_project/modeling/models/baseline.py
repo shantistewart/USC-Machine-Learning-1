@@ -2,30 +2,20 @@
 
 
 from sklearn.neighbors import NearestCentroid
-from final_project.modeling.model_pipeline_class import ModelPipeline
+from final_project.modeling.final_evaluation import final_eval
 
 
 # data file names:
 train_data_file = "../../data/student_performance_train.csv"
 test_data_file = "../../data/student_performance_test.csv"
-# mission type:
-mission = 1
 
 
 print()
 # create nearest means classifier (with Euclidean distance metric):
 model = NearestCentroid(metric="euclidean")
+# normalization type:
+norm_type = "standard"
 
-# train model:
-model_pipe = ModelPipeline(mission, model, norm_type="standard")
-print("Training model...")
-model_pipe.train(train_data_file)
-
-# evaluate model on training set:
-print("\nEvaluating on training set...")
-model_pipe.eval(train_data_file, verbose=2)
-
-# evaluate model on test set:
-print("\nEvaluating on test set...")
-model_pipe.eval(test_data_file, verbose=2)
+# train and evaluate model:
+final_eval(model, norm_type, train_data_file, test_data_file)
 
