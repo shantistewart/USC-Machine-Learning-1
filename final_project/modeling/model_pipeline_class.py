@@ -71,7 +71,7 @@ class ModelPipeline:
         """Trains model.
 
         Args:
-            train_data_file: Name of data file.
+            train_data_file: Name of training data file.
 
         Returns: None
         """
