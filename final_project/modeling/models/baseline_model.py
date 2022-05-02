@@ -1,4 +1,4 @@
-"""Script for running a nearest means classifier (baseline system)."""
+"""Script for running a nearest means classifier (baseline model)."""
 
 
 from sklearn.neighbors import NearestCentroid
