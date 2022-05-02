@@ -64,7 +64,7 @@ class ModelPipeline:
 
         Args:
             data_file: Name of data file.
-            verbose: Nothing printed (0), accuracy and macro F1-score printed (1), all metrics printed (2)
+            verbose: Nothing printed (0), accuracy and macro F1-score printed (1), all metrics printed (2).
 
         Returns:
             metrics: Dictionary of performance metrics.
