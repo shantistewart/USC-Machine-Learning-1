@@ -1,33 +1,31 @@
 """Script for running a nearest means classifier (baseline system) for mission 1."""
 
 
-import numpy as np
-import matplotlib.pyplot as plt
-from final_project.preprocessing.load_data_class import DataLoader
-from final_project.preprocessing.preprocess_class import Preprocessor
-from final_project.models.make_pipeline import make_pipeline
+from sklearn.neighbors import NearestCentroid
+from final_project.models.model_pipeline_class import ModelPipeline
 
 
-# training data file name:
+# data file names:
 train_data_file = "../../data/student_performance_train.csv"
+test_data_file = "../../data/student_performance_test.csv"
 # mission type:
 mission = 1
-# names of binary/nominal features:
-bin_feature_names = ["school", "sex", "address", "famsize", "Pstatus", "schoolsup", "famsup", "paid", "activities",
-                     "nursery", "higher", "internet", "romantic"]
-nom_feature_names = ["Mjob", "Fjob", "reason", "guardian"]
-# bins for quantizing labels:
-bins = np.array([20.5, 16, 14, 12, 10, 0])
 
 
-# TRAINING:
+print()
+# create nearest means classifier (with Euclidean distance metric):
+model = NearestCentroid(metric="euclidean")
 
-# load data:
-loader = DataLoader()
-X_orig, y_orig = loader.load_and_split_data(train_data_file, mission)
-# preprocess data:
-prep = Preprocessor()
-X, y = prep.preprocess_data(X_orig, y_orig, bin_feature_names, nom_feature_names, bins, train=True)
+# train model:
+model_pipe = ModelPipeline(mission, model, norm_type="standard")
+print("Training model...")
+model_pipe.train(train_data_file)
 
-# make model pipeline:
+# evaluate model on training set:
+print("\nEvaluating on training set...")
+model_pipe.eval(train_data_file, verbose=2)
+
+# evaluate model on test set:
+print("\nEvaluating on test set...")
+model_pipe.eval(test_data_file, verbose=2)
 
