@@ -17,9 +17,10 @@ model = KNeighborsClassifier()
 # normalization type:
 norm_type = "standard"
 # hyperparameter values to search over:
-k_values = np.arange(start=0, stop=101, step=10)
+k_values = np.arange(start=0, stop=51, step=2)
 k_values[0] = 1
-hyperparams = {"model__n_neighbors": k_values}
+hyperparams = {"model__n_neighbors": k_values,
+               "model__weights": ["uniform", "distance"]}
 # scoring metric:
 metric = "f1_macro"
 
