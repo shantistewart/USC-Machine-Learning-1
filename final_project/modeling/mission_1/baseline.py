@@ -2,7 +2,7 @@
 
 
 from sklearn.neighbors import NearestCentroid
-from final_project.models.model_pipeline_class import ModelPipeline
+from final_project.modeling.model_pipeline_class import ModelPipeline
 
 
 # data file names:
