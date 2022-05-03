@@ -208,7 +208,11 @@ class ModelPipeline:
         if self.feature_select == "KBest":
             feature_selector = SelectKBest()
         elif self.feature_select == "SFS":
-            feature_selector = SequentialFeatureSelector()
+            pipe = Pipeline(steps=[
+                ("normalizer", normalizer),
+                ("model", model)
+            ])
+            feature_selector = SequentialFeatureSelector(pipe)
         # create sklearn PCA transformer:
         pca = None
         if pca:
