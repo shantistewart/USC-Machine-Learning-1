@@ -86,7 +86,7 @@ class DataLoader:
             # extract labels:
             y = data["G3"]
             # extract features:
-            X = data.drop(columns=["G3", "G1", "G1"])
+            X = data.drop(columns=["G3", "G1", "G2"])
         elif mission == 3:
             # extract labels:
             y = data["G3"]
