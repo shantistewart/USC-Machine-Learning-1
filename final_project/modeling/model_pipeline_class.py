@@ -220,11 +220,11 @@ class ModelPipeline:
             feature_selector = SequentialFeatureSelector(pipe)
         # create sklearn PCA transformer:
         pca = None
-        if pca:
+        if self.pca:
             pca = PCA()
 
         # create pipeline:
-        if pca:
+        if self.pca:
             self.model_pipe = Pipeline(steps=[
                 ("normalizer", normalizer),
                 ("selector", feature_selector),
