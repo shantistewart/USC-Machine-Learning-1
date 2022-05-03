@@ -6,8 +6,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import SelectKBest, SequentialFeatureSelector
 from sklearn.decomposition import PCA
-from sklearn.model_selection import cross_validate
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import cross_validate, GridSearchCV, RandomizedSearchCV
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
 from final_project.preprocessing.load_data_class import DataLoader
 from final_project.preprocessing.preprocess_class import Preprocessor
@@ -146,16 +145,19 @@ class ModelPipeline:
 
         return metrics
 
-    def tune_hyperparams(self, data_file, hyper_params, search_type="grid", n_folds=10, metric="accuracy", verbose=1):
+    def tune_hyperparams(self, data_file, hyper_params, search_type="grid", metric="accuracy", n_iters=None, n_folds=10,
+                         verbose=1):
         """Tunes hyperparameters (i.e., model selection).
 
         Args:
             data_file: Name of data file (used for training/validation).
             hyper_params: Dictionary of hyperparameter values to search over.
             search_type: Hyperparameter search type.
-                allowed values: "grid"
-            n_folds: Number of folds (K) to use in stratified K-fold cross validation.
+                allowed values: "grid", "random"
             metric: Type of metric to use for model evaluation.
+            n_iters: Number of hyperparameter combinations that are tried in random search (ignored if
+                search_type != "random")
+            n_folds: Number of folds (K) to use in stratified K-fold cross validation.
             verbose: Nothing printed (not 2), best hyperparameters printed (2).
 
         Returns:
@@ -165,7 +167,7 @@ class ModelPipeline:
         """
 
         # validate hyperparameter search type:
-        if search_type != "grid":
+        if search_type != "grid" and search_type != "random":
             raise Exception("Invalid hyperparameter search type.")
 
         # load data:
@@ -178,6 +180,9 @@ class ModelPipeline:
         search = None
         if search_type == "grid":
             search = GridSearchCV(self.model_pipe, hyper_params, cv=n_folds, scoring=metric)
+        elif search_type == "random":
+            search = RandomizedSearchCV(self.model_pipe, hyper_params, n_iter=n_iters, cv=n_folds, scoring=metric)
+        # run hyperparameter search:
         search.fit(X, y)
 
         # save best model, best hyperparameters, and best cross-validation score:

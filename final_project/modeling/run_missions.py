@@ -9,7 +9,7 @@ MISSIONS = [1, 2, 3]
 
 
 def run_missions(train_data_file, test_data_file, model, norm_type="standard", feature_select="KBest", pca=False,
-                 tune_model=True, hyper_params=None, search_type="grid", n_folds=10, metric="accuracy",
+                 tune_model=True, hyper_params=None, search_type="grid", metric="accuracy", n_iters=None, n_folds=10,
                  final_eval=False, missions=None, verbose=2):
     """Trains, tunes, and evaluates model, for each mission.
 
@@ -20,14 +20,16 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", f
         norm_type: Type of normalization to use.
             allowed values: "standard"
         feature_select: Method of feature selection.
-            allowed values: "KBest", "SFS"
+            allowed values: "grid", "random"
         pca: Selects whether to use PCA.
         tune_model: Selects whether to tune hyperparameters of model.
         hyper_params: Dictionary of hyperparameter values to search over (ignored if tune_model = False).
         search_type: Hyperparameter search type (ignored if tune_model = False).
             allowed values: "grid"
-        n_folds: Number of folds (K) to use in stratified K-fold cross validation.
         metric: Type of metric to use for model evaluation (ignored if tune_model = False).
+        n_iters: Number of hyperparameter combinations that are tried in random search (ignored if tune_model = False
+            or if search_type != "random")
+        n_folds: Number of folds (K) to use in stratified K-fold cross validation.
         final_eval: Selects whether to evaluate final model on test set.
         missions: List of missions to perform.
         verbose: Nothing printed (0), some things printed (1), everything printed (2).
@@ -69,8 +71,8 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", f
                 raise Exception("Hyperparameter search values argument is none.")
             best_model, best_hyperparams, best_cv_score = model_pipe.tune_hyperparams(train_data_file, hyper_params,
                                                                                       search_type=search_type,
-                                                                                      n_folds=n_folds, metric=metric,
-                                                                                      verbose=verbose)
+                                                                                      metric=metric, n_iters=n_iters,
+                                                                                      n_folds=n_folds, verbose=verbose)
             # save best model information to nested dictionary:
             best_models["mission_" + str(mission)] = {}
             best_models["mission_" + str(mission)]["hyperparams"] = best_hyperparams
