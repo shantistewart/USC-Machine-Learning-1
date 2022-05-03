@@ -218,14 +218,14 @@ class ModelPipeline:
         if pca:
             self.model_pipe = Pipeline(steps=[
                 ("normalizer", normalizer),
-                ("model", model),
                 ("feature_selector", feature_selector),
-                ("pca", pca)
+                ("pca", pca),
+                ("model", model)
             ])
         else:
             self.model_pipe = Pipeline(steps=[
                 ("normalizer", normalizer),
-                ("model", model),
-                ("feature_selector", feature_selector)
+                ("feature_selector", feature_selector),
+                ("model", model)
             ])
 
