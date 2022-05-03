@@ -29,18 +29,18 @@ n_folds = 10
 search_type = "grid"
 metric = "f1_macro"
 # hyperparameter values to search over:
+# type of weight function for KNN:
+weight_types = ["uniform", "distance"]
 # number of nearest neighbors for KNN:
 K_values = np.arange(start=0, stop=21, step=5)
 K_values[0] = 1
-# type of weight function for KNN:
-weight_types = ["uniform", "distance"]
 # scoring function for SelectKBest feature selection:
 kbest_scores = [f_classif, mutual_info_classif]
 # number of features to keep for SelectKBest feature selection:
 n_features_select = np.arange(start=5, stop=41, step=5)
 
-hyperparams = {"model__n_neighbors": K_values,
-               "model__weights": weight_types,
+hyperparams = {"model__weights": weight_types,
+               "model__n_neighbors": K_values,
                "selector__score_func": kbest_scores,
                "selector__k": n_features_select}
 print("Hyperparameter search values:\n{}".format(hyperparams))
