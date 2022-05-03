@@ -25,14 +25,14 @@ class ModelPipeline:
         norm_type: Type of normalization to use.
             allowed values: "standard"
         feature_select: Method of feature selection.
-            allowed values: "KBest", "SFS", or None
+            allowed values: "KBest", "SFS"
         pca: Selects whether to use PCA.
         model_pipe: sklearn Pipeline object for model.
             Updated to best model (i.e., model with best hyperparameters) when tune_hyperparams() method is called.
         best_hyperparams: Best hyperparameters (dictionary).
     """
 
-    def __init__(self, mission, model, norm_type="standard", feature_select=None, pca=False):
+    def __init__(self, mission, model, norm_type="standard", feature_select="KBest", pca=False):
         """Initializes ModelPipeline object.
 
         Args:
@@ -44,7 +44,7 @@ class ModelPipeline:
             norm_type: Type of normalization to use.
                 allowed values: "standard"
             feature_select: Method of feature selection.
-                allowed values: "KBest", "SFS", or None
+                allowed values: "KBest", "SFS"
             pca: Selects whether to use PCA.
 
         Returns: None
