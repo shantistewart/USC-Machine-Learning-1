@@ -30,10 +30,10 @@ search_type = "random"
 n_iters = 1000
 metric = "f1_macro"
 # hyperparameter values to search over:
-# regularization parameter C in SVM (inversely proportional to regularization strength):
-C_values = np.logspace(-3, 3, num=100, base=2)
 # type of kernel to use for SVM:
 kernel_types = ["rbf", "sigmoid"]
+# regularization parameter C in SVM (inversely proportional to regularization strength):
+C_values = np.logspace(-3, 3, num=100, base=2)
 # coefficient for kernel:
 gamma_values = np.logspace(-10, 3, num=100, base=2)
 # scoring function for SelectKBest feature selection:
@@ -41,8 +41,8 @@ kbest_scores = [f_classif, mutual_info_classif]
 # number of features to keep for SelectKBest feature selection:
 n_features_select = np.arange(start=1, stop=45, step=1)
 
-hyperparams = {"model__C": C_values,
-               "model__kernel": kernel_types,
+hyperparams = {"model__kernel": kernel_types,
+               "model__C": C_values,
                "model__gamma": gamma_values,
                "selector__score_func": kbest_scores,
                "selector__k": n_features_select}
