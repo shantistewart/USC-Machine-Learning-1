@@ -8,8 +8,9 @@ from final_project.modeling.model_pipeline_class import ModelPipeline
 MISSIONS = [1, 2, 3]
 
 
-def run_missions(train_data_file, test_data_file, model, norm_type="standard", tune_model=True, hyper_params=None,
-                 search_type="grid", n_folds=10, metric="accuracy", final_eval=False, missions=None, verbose=2):
+def run_missions(train_data_file, test_data_file, model, norm_type="standard", feature_select="KBest", pca=False,
+                 tune_model=True, hyper_params=None, search_type="grid", n_folds=10, metric="accuracy",
+                 final_eval=False, missions=None, verbose=2):
     """Trains, tunes, and evaluates model, for each mission.
 
     Args:
@@ -18,6 +19,9 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", t
         model: sklearn model (estimator) object, with some initial hyperparameters.
         norm_type: Type of normalization to use.
             allowed values: "standard"
+        feature_select: Method of feature selection.
+            allowed values: "KBest", "SFS"
+        pca: Selects whether to use PCA.
         tune_model: Selects whether to tune hyperparameters of model.
         hyper_params: Dictionary of hyperparameter values to search over (ignored if tune_model = False).
         search_type: Hyperparameter search type (ignored if tune_model = False).
@@ -49,9 +53,10 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", t
             print("\nMISSION {}:\n".format(mission))
 
         # create initial ModelPipeline object:
-        model_pipe = ModelPipeline(mission, model, norm_type=norm_type)
+        model_pipe = ModelPipeline(mission, model, norm_type=norm_type, feature_select=feature_select, pca=pca)
 
-        # if tuning not desired, train model using given hyperparameters:
+        # if tuning not desired, train model using given hyperparameters
+        #   (note: feature selection and PCA transformer are created with default parameters):
         if not tune_model:
             if verbose != 0:
                 print("Training model...")
