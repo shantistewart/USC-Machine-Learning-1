@@ -25,6 +25,9 @@ pca = False
 n_folds = 10
 
 
+# hyperparameter search method and scoring metric:
+search_type = "grid"
+metric = "f1_macro"
 # hyperparameter values to search over:
 # number of nearest neighbors for KNN:
 K_values = np.arange(start=0, stop=21, step=5)
@@ -41,10 +44,8 @@ hyperparams = {"model__n_neighbors": K_values,
                "selector__score_func": kbest_scores,
                "selector__k": n_features_select}
 print("Hyperparameter search values:\n{}".format(hyperparams))
-# scoring metric:
-metric = "f1_macro"
 
 # run all missions:
 run_missions(train_data_file, test_data_file, model, norm_type=norm_type, feature_select=feature_select, pca=pca,
-             hyper_params=hyperparams, metric=metric, verbose=2)
+             hyper_params=hyperparams, search_type=search_type, metric=metric, n_folds=n_folds, verbose=2)
 
