@@ -20,12 +20,12 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", f
         norm_type: Type of normalization to use.
             allowed values: "standard"
         feature_select: Method of feature selection.
-            allowed values: "grid", "random"
+            allowed values: "KBest", "SFS"
         pca: Selects whether to use PCA.
         tune_model: Selects whether to tune hyperparameters of model.
         hyper_params: Dictionary of hyperparameter values to search over (ignored if tune_model = False).
         search_type: Hyperparameter search type (ignored if tune_model = False).
-            allowed values: "grid"
+            allowed values: "grid", "random"
         metric: Type of metric to use for model evaluation (ignored if tune_model = False).
         n_iters: Number of hyperparameter combinations that are tried in random search (ignored if tune_model = False
             or if search_type != "random")
