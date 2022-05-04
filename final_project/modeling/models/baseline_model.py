@@ -22,7 +22,7 @@ n_folds = 10
 n_features_select = ["all"]
 hyperparams = {"selector__k": n_features_select}
 
-# train and evaluate model:
+# run all missions:
 run_missions(train_data_file, test_data_file, model, norm_type=norm_type, feature_select="KBest",
              hyper_params=hyperparams, n_folds=n_folds, verbose=2)
 
