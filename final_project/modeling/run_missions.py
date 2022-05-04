@@ -37,6 +37,7 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", f
     Returns:
         metrics: Nested dictionary of training/test set metrics.
             metrics["mission_x"]["train"]["metric_name"] = mission x's training set metric_name metric
+            metrics["mission_x"]["val"]["metric_name"] = mission x's cross-validation metric_name metric
             metrics["mission_x"]["test"]["metric_name"] = mission x's test set metric_name metric
         best_models: Nested dictionary of best model information after hyperparameter tuning.
             best_models["mission_x"]["hyperparams"] = mission x's best model hyperparameters
@@ -86,7 +87,7 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", f
         # evaluate model using cross validation:
         if verbose != 0:
             print("\nEvaluating model using cross validation...")
-        model_pipe.eval(train_data_file, "cross_val", n_folds=n_folds, verbose=verbose)
+        val_metrics = model_pipe.eval(train_data_file, "cross_val", n_folds=n_folds, verbose=verbose)
         # (re)train model on full training set (since cross validation alters the sklearn Pipeline object):
         model_pipe.train(train_data_file)
 
@@ -98,9 +99,10 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", f
         if verbose != 0:
             print("")
 
-        # save training/test set metrics to nested dictionary:
+        # save training/cross-validation/test set metrics to nested dictionary:
         metrics["mission_" + str(mission)] = {}
         metrics["mission_" + str(mission)]["train"] = train_metrics
+        metrics["mission_" + str(mission)]["val"] = val_metrics
         if final_eval:
             metrics["mission_" + str(mission)]["test"] = test_metrics
 
