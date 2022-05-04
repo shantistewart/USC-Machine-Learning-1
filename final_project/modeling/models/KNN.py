@@ -41,7 +41,7 @@ kbest_scores = [f_classif, mutual_info_classif]
 # number of features to keep for SelectKBest feature selection:
 n_features_select = np.arange(start=1, stop=N_FEATURES+1, step=1)
 # fraction of variance required to be explained by result of PCA:
-pca_var = np.linspace(0.25, 1.0, num=16)
+pca_var = np.arange(0.25, 1.05, step=0.05)
 pca_var[len(pca_var)-1] = 0.99
 
 if pca:
