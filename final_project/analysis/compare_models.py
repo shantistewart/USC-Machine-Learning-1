@@ -104,7 +104,7 @@ all_metrics = {
 }
 
 
-# plot:
+# plot bar graphs:
 bar_width = 0.25
 fig_num = 1
 for mission in all_metrics.keys():
@@ -134,12 +134,13 @@ for mission in all_metrics.keys():
         bar_pos[metric_type] = np.arange(n_models) + k * bar_width
         k += 1
 
-    # plot all metrics on the same plot:
+    # plot all metrics on same plot:
     fig = plt.subplots()
     for metric_type in metric_types:
-        plt.bar(bar_pos[metric_type], metrics[metric_type], width=bar_width, label=metric_names[metric_type])
+        plt.bar(bar_pos[metric_type], metrics[metric_type], width=bar_width, align="edge",
+                label=metric_names[metric_type])
     # label bars by model (more accurately, groups of bars):
-    plt.xticks([r + bar_width for r in range(n_models)], model_names_plot)
+    plt.xticks(np.arange(n_models) + 0.5*len(metrics)*bar_width, model_names_plot)
     # annotate plot:
     plt.title(mission_names[mission] + " Comparison of Models")
     plt.ylabel("Cross-Validation Performance Value")
