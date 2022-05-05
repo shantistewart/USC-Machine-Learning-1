@@ -1,4 +1,4 @@
-"""Script for comparing performance of models."""
+"""Script for comparing cross-validation performance of all models."""
 
 
 import numpy as np
