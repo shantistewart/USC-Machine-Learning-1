@@ -104,7 +104,42 @@ all_metrics = {
 }
 
 
-# plot bar graphs:
+print()
+# nested dictionaries with missions as 1st-level keys and metric names as 2nd-level keys:
+best_models = {}
+best_metrics = {}
+# determine best-performing models, separately for each mission:
+for mission in all_metrics.keys():
+    # cross-validation metrics for current mission:
+    metrics_mission = all_metrics[mission]
+    metric_types = list(metrics_mission[list(metrics_mission.keys())[0]].keys())
+
+    # dictionaries with metric names as keys:
+    best_models_mission = {}
+    best_metrics_mission = {}
+    for metric_type in metric_types:
+        best_metrics_mission[metric_type] = 0.0
+
+    # find best-performing models, with respect to different metrics:
+    for model in metrics_mission.keys():
+        for metric_type in metric_types:
+            metric_value = metrics_mission[model][metric_type]
+            if metric_value > best_metrics_mission[metric_type]:
+                best_models_mission[metric_type] = model
+                best_metrics_mission[metric_type] = metric_value
+    best_models[mission] = best_models_mission
+    best_metrics[mission] = best_metrics_mission
+
+# print best-performing models:
+for mission in all_metrics.keys():
+    print()
+    print("For " + mission_names[mission] + ":")
+    metric_types = list(all_metrics[mission][list(all_metrics[mission].keys())[0]].keys())
+    for metric_type in metric_types:
+        print("Best-performing model w.r.t. " + metric_type + ": " + model_names[best_models[mission][metric_type]])
+
+
+# plot bar graphs of cross-validation performance to compare models:
 bar_width = 0.25
 fig_num = 1
 for mission in all_metrics.keys():
