@@ -8,7 +8,7 @@ from final_project.modeling.model_pipeline_class import ModelPipeline
 MISSIONS = [1, 2, 3]
 
 
-def run_missions(train_data_file, test_data_file, model, norm_type="standard", feature_eng=None, feature_select=None,
+def run_missions(train_data_file, test_data_file, model, norm_type="standard", feature_select=None, feature_eng=None,
                  pca=False, tune_model=True, hyper_params=None, search_type="grid", metric="accuracy", n_iters=None,
                  n_folds=10, final_eval=False, missions=None, verbose=2):
     """Trains, tunes, and evaluates model, for each mission.
@@ -19,10 +19,10 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", f
         model: sklearn model (estimator) object, with some initial hyperparameters.
         norm_type: Type of normalization to use.
             allowed values: "standard", None
-        feature_eng: Method of feature engineering.
-            allowed values: "poly", None
         feature_select: Method of feature selection.
             allowed values: "KBest", "SFS", None
+        feature_eng: Method of feature engineering.
+            allowed values: "poly", None
         pca: Selects whether to use PCA.
         tune_model: Selects whether to tune hyperparameters of model.
         hyper_params: Dictionary of hyperparameter values to search over (ignored if tune_model = False).
@@ -58,8 +58,8 @@ def run_missions(train_data_file, test_data_file, model, norm_type="standard", f
             print("\nMISSION {}:\n".format(mission))
 
         # create initial ModelPipeline object:
-        model_pipe = ModelPipeline(mission, model, norm_type=norm_type, feature_eng=feature_eng,
-                                   feature_select=feature_select, pca=pca)
+        model_pipe = ModelPipeline(mission, model, norm_type=norm_type, feature_select=feature_select,
+                                   feature_eng=feature_eng, pca=pca)
 
         # if tuning not desired, train model using given hyperparameters
         #   (note: feature selection and PCA transformer are created with default parameters):
