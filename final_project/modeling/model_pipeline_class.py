@@ -22,16 +22,16 @@ class ModelPipeline:
             Mission 3: predict G3, while keeping G1 and G2 features.
         preprocessor: Preprocessor object.
         norm_type: Type of normalization to use.
-            allowed values: "standard"
+            allowed values: "standard", None
         feature_select: Method of feature selection.
-            allowed values: "KBest", "SFS"
+            allowed values: "KBest", "SFS", None
         pca: Selects whether to use PCA.
         model_pipe: sklearn Pipeline object for model.
             Updated to best model (i.e., model with best hyperparameters) when tune_hyperparams() method is called.
         best_hyperparams: Best hyperparameters (dictionary).
     """
 
-    def __init__(self, mission, model, norm_type="standard", feature_select="KBest", pca=False):
+    def __init__(self, mission, model, norm_type="standard", feature_select=None, pca=False):
         """Initializes ModelPipeline object.
 
         Args:
@@ -41,18 +41,18 @@ class ModelPipeline:
                 Mission 3: predict G3, while keeping G1 and G2 features.
             model: sklearn model (estimator) object.
             norm_type: Type of normalization to use.
-                allowed values: "standard"
+                allowed values: "standard", None
             feature_select: Method of feature selection.
-                allowed values: "KBest", "SFS"
+                allowed values: "KBest", "SFS", None
             pca: Selects whether to use PCA.
 
         Returns: None
         """
 
         # validate normalization type and feature selection method:
-        if norm_type != "standard":
+        if norm_type is not None and norm_type != "standard":
             raise Exception("Invalid normalization type.")
-        if feature_select != "KBest" and feature_select != "SFS":
+        if feature_select is not None and feature_select != "KBest" and feature_select != "SFS":
             raise Exception("Invalid feature selection method.")
 
         self.mission = mission
@@ -208,33 +208,27 @@ class ModelPipeline:
         normalizer = None
         if self.norm_type == "standard":
             normalizer = StandardScaler()
+
         # create sklearn feature selection transformer:
         feature_selector = None
         if self.feature_select == "KBest":
             feature_selector = SelectKBest()
         elif self.feature_select == "SFS":
-            pipe = Pipeline(steps=[
-                ("normalizer", normalizer),
-                ("model", model)
-            ])
-            feature_selector = SequentialFeatureSelector(pipe)
+            feature_selector = SequentialFeatureSelector(model)
+
         # create sklearn PCA transformer:
         pca = None
         if self.pca:
             pca = PCA()
 
-        # create pipeline:
-        if self.pca:
-            self.model_pipe = Pipeline(steps=[
-                ("normalizer", normalizer),
-                ("selector", feature_selector),
-                ("pca", pca),
-                ("model", model)
-            ])
-        else:
-            self.model_pipe = Pipeline(steps=[
-                ("normalizer", normalizer),
-                ("selector", feature_selector),
-                ("model", model)
-            ])
+        # create sklearn pipeline:
+        steps = []
+        if normalizer is not None:
+            steps.append(("normalizer", normalizer))
+        if feature_selector is not None:
+            steps.append(("selector", feature_selector))
+        if pca is not None:
+            steps.append(("pca", pca))
+        steps.append(("model", model))
+        self.model_pipe = Pipeline(steps=steps)
 
