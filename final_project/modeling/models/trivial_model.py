@@ -22,11 +22,6 @@ n_folds = 10
 # number of trials for averaging performance:
 n_trials = 10
 
-# do not use feature selection (since model is trivial):
-n_features_select = ["all"]
-hyperparams = {"selector__k": n_features_select}
-
-
 # run all missions:
 verbose = 1
 for mission in MISSIONS:
@@ -39,7 +34,7 @@ for mission in MISSIONS:
     # train model:
     if verbose != 0:
         print("Training model...")
-    model_pipe.tune_hyperparams(train_data_file, hyperparams)
+    model_pipe.train(train_data_file)
 
     accuracy_sum_train = 0.0
     macro_f1_sum_train = 0.0
