@@ -12,11 +12,12 @@ mission_names = {
     "mission3": "Mission 3"
 }
 model_names = {
-    "trivial": "Trivial System",
-    "baseline": "Baseline System",
-    "knn": "KNN Classifier",
-    "logistic": "Logistic Regression",
-    "svm": "SVM Classifier"
+    "trivial": "Trivial",
+    "baseline": "Baseline",
+    "knn": "KNN",
+    "logistic": "Logistic",
+    "svm": "SVM",
+    "nearest_means": "Nearest Means"
 }
 metric_names = {
     "accuracy": "Accuracy",
@@ -45,6 +46,10 @@ mission1_metrics = {
     "svm": {
         "accuracy": 0.385,
         "macro_f1": 0.317
+    },
+    "nearest_means": {
+        "accuracy": 0.309,
+        "macro_f1": 0.285
     }
 }
 
@@ -69,6 +74,10 @@ mission2_metrics = {
     "svm": {
         "accuracy": 0.379,
         "macro_f1": 0.342
+    },
+    "nearest_means": {
+        "accuracy": 0.364,
+        "macro_f1": 0.358
     }
 }
 
@@ -93,6 +102,10 @@ mission3_metrics = {
     "svm": {
         "accuracy": 0.765,
         "macro_f1": 0.754
+    },
+    "nearest_means": {
+        "accuracy": 0.755,
+        "macro_f1": 0.748
     }
 }
 
