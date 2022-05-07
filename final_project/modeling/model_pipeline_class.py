@@ -3,7 +3,7 @@
 
 import numpy as np
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.feature_selection import SelectKBest, SequentialFeatureSelector
 from sklearn.decomposition import PCA
 from sklearn.model_selection import cross_validate, GridSearchCV, RandomizedSearchCV
@@ -23,6 +23,8 @@ class ModelPipeline:
         preprocessor: Preprocessor object.
         norm_type: Type of normalization to use.
             allowed values: "standard", None
+        feature_eng: Method of feature engineering.
+            allowed values: "poly", None
         feature_select: Method of feature selection.
             allowed values: "KBest", "SFS", None
         pca: Selects whether to use PCA.
@@ -31,7 +33,7 @@ class ModelPipeline:
         best_hyperparams: Best hyperparameters (dictionary).
     """
 
-    def __init__(self, mission, model, norm_type="standard", feature_select=None, pca=False):
+    def __init__(self, mission, model, norm_type="standard", feature_eng=None, feature_select=None, pca=False):
         """Initializes ModelPipeline object.
 
         Args:
@@ -42,6 +44,8 @@ class ModelPipeline:
             model: sklearn model (estimator) object.
             norm_type: Type of normalization to use.
                 allowed values: "standard", None
+            feature_eng: Method of feature engineering.
+                allowed values: "poly", None
             feature_select: Method of feature selection.
                 allowed values: "KBest", "SFS", None
             pca: Selects whether to use PCA.
@@ -49,15 +53,18 @@ class ModelPipeline:
         Returns: None
         """
 
-        # validate normalization type and feature selection method:
+        # validate parameters:
         if norm_type is not None and norm_type != "standard":
             raise Exception("Invalid normalization type.")
+        if feature_eng is not None and feature_eng != "poly":
+            raise Exception("Invalid feature engineering method.")
         if feature_select is not None and feature_select != "KBest" and feature_select != "SFS":
             raise Exception("Invalid feature selection method.")
 
         self.mission = mission
         self.preprocessor = Preprocessor()
         self.norm_type = norm_type
+        self.feature_eng = feature_eng
         self.feature_select = feature_select
         self.pca = pca
         self.best_hyperparams = None
@@ -209,6 +216,11 @@ class ModelPipeline:
         if self.norm_type == "standard":
             normalizer = StandardScaler()
 
+        # create sklearn feature engineering transformer:
+        feature_engineer = None
+        if self.feature_eng == "poly":
+            feature_engineer = PolynomialFeatures()
+
         # create sklearn feature selection transformer:
         feature_selector = None
         if self.feature_select == "KBest":
@@ -225,6 +237,8 @@ class ModelPipeline:
         steps = []
         if normalizer is not None:
             steps.append(("normalizer", normalizer))
+        if feature_engineer is not None:
+            steps.append(("engineer", feature_engineer))
         if feature_selector is not None:
             steps.append(("selector", feature_selector))
         if pca is not None:
