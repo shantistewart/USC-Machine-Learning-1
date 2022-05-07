@@ -1,7 +1,7 @@
 """Script for running trivial model."""
 
 
-from final_project.modeling.models.trivial_model_class import TrivialClassifier
+from final_project.modeling.trivial_model_class import TrivialClassifier
 from final_project.modeling.model_pipeline_class import ModelPipeline
 
 
