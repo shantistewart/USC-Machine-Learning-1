@@ -22,6 +22,7 @@ n_folds = 10
 # number of trials for averaging performance:
 n_trials = 10
 
+
 # run all missions:
 verbose = 1
 for mission in MISSIONS:
@@ -40,6 +41,8 @@ for mission in MISSIONS:
     macro_f1_sum_train = 0.0
     accuracy_sum_val = 0.0
     macro_f1_sum_val = 0.0
+    accuracy_sum_test = 0.0
+    macro_f1_sum_test = 0.0
     for i in range(n_trials):
         # evaluate model on training set:
         train_metrics = model_pipe.eval(train_data_file, "train", verbose=0)
@@ -51,15 +54,25 @@ for mission in MISSIONS:
         accuracy_sum_val += val_metrics["accuracy"]
         macro_f1_sum_val += val_metrics["macro_f1"]
 
+        # evaluate model on test set:
+        test_metrics = model_pipe.eval(test_data_file, "test", verbose=0)
+        accuracy_sum_test += test_metrics["accuracy"]
+        macro_f1_sum_test += test_metrics["macro_f1"]
+
     # compute averages:
     accuracy_train = accuracy_sum_train / n_trials
     macro_f1_train = macro_f1_sum_train / n_trials
     accuracy_val = accuracy_sum_val / n_trials
     macro_f1_val = macro_f1_sum_val / n_trials
+    accuracy_test = accuracy_sum_test / n_trials
+    macro_f1_test = macro_f1_sum_test / n_trials
 
     print()
     print("Average training accuracy = {}".format(100 * accuracy_train))
     print("Average training macro F1-score = {}".format(macro_f1_train))
     print("Average cross-validation accuracy = {}".format(100 * accuracy_val))
     print("Average cross-validation macro F1-score = {}".format(macro_f1_val))
+    print("Average test accuracy = {}".format(100 * accuracy_test))
+    print("Average test macro F1-score = {}".format(macro_f1_test))
+    print("Test confusion matrix =\n{}".format(test_metrics["conf_matrix"]))
 
