@@ -19,5 +19,6 @@ norm_type = "standard"
 n_folds = 10
 
 # run all missions:
-run_missions(train_data_file, test_data_file, model, norm_type=norm_type, tune_model=False, n_folds=n_folds, verbose=2)
+run_missions(train_data_file, test_data_file, model, norm_type=norm_type, tune_model=False, n_folds=n_folds,
+             final_eval=True, verbose=2)
 
