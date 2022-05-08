@@ -163,39 +163,3 @@ class Preprocessor:
 
         return y
 
-
-"""
-# TESTING:
-from final_project.preprocessing.load_data_class import DataLoader
-
-# data file name:
-data_file = "../data/student_performance_train.csv"
-# mission type:
-mission = 3
-
-print()
-# load data:
-loader = DataLoader()
-X_orig, y_orig = loader.load_and_split_data(data_file, mission)
-# print("Dim of X_orig: {}".format(X_orig.shape))
-# print(X_orig.head())
-
-# encode features:
-prep = Preprocessor()
-X = prep.encode_features(X_orig, train=True)
-print()
-print("Dim of X: {}".format(X.shape))
-print(X.head())
-print("\n")
-print(X.info())
-print()
-print(X.describe())
-
-# test quantize_labels() method:
-y = prep.quantize_labels(y_orig)
-print()
-print(y_orig)
-print()
-print(y)
-"""
-
